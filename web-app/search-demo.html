@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Economics API Search Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .search-btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .search-btn:hover {
+            background: #0056b3;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+            border-radius: 5px;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .result-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .example-queries {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .example-queries h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        
+        .example-link {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .example-link:hover {
+            background: #0056b3;
+        }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Trading Economics Search API Demo</h1>
+        
+        <div class="example-queries">
+            <h3>Try these example searches:</h3>
+            <a href="#" class="example-link" onclick="searchFor('nigeria')">Nigeria</a>
+            <a href="#" class="example-link" onclick="searchFor('united states gdp')">US GDP</a>
+            <a href="#" class="example-link" onclick="searchFor('china inflation')">China Inflation</a>
+            <a href="#" class="example-link" onclick="searchFor('oil prices')">Oil Prices</a>
+            <a href="#" class="example-link" onclick="searchFor('unemployment')">Unemployment</a>
+            <a href="#" class="example-link" onclick="searchFor('interest rates')">Interest Rates</a>
+        </div>
+        
+        <div class="search-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search for countries, indicators, or economic data..." value="nigeria">
+            <button onclick="performSearch()" class="search-btn">Search Trading Economics Data</button>
+        </div>
+        
+        <div id="apiUrl" class="api-url" style="display: none;"></div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            Searching Trading Economics database...
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // Search functionality using the Trading Economics Search API
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            const loadingEl = document.getElementById('loading');
+            const resultsEl = document.getElementById('results');
+            const errorEl = document.getElementById('error');
+            const apiUrlEl = document.getElementById('apiUrl');
+            
+            // Show loading state
+            loadingEl.style.display = 'block';
+            resultsEl.innerHTML = '';
+            errorEl.style.display = 'none';
+            
+            // Construct the API URL (as mentioned in the challenge)
+            const apiUrl = `https://brains.tradingeconomics.com/v2/search/wb,fred,comtrade?q=${encodeURIComponent(query)}&pp=50&p=0&_=${Date.now()}&stance=2`;
+            
+            // Show the API URL being used
+            apiUrlEl.innerHTML = `<strong>API URL:</strong> ${apiUrl}`;
+            apiUrlEl.style.display = 'block';
+            
+            try {
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayResults(data, query);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                errorEl.innerHTML = `
+                    <strong>Search Error:</strong> ${error.message}<br>
+                    <small>Note: CORS restrictions may prevent direct API calls from browsers. 
+                    In a production app, you would proxy these requests through your backend server.</small>
+                `;
+                errorEl.style.display = 'block';
+                
+                // Show mock results for demonstration
+                showMockResults(query);
+            }
+            
+            loadingEl.style.display = 'none';
+        }
+        
+        function displayResults(data, query) {
+            const resultsEl = document.getElementById('results');
+            
+            if (!data.hits || data.hits.length === 0) {
+                resultsEl.innerHTML = '<p>No results found for your search.</p>';
+                return;
+            }
+            
+            let html = `<h3>📊 Found ${data.hits.length} results for "${query}"</h3>`;
+            
+            data.hits.forEach(item => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-title">${item.pretty_name || item.name}</div>
+                        <div class="result-meta">
+                            <strong>Country:</strong> ${item.country || 'N/A'} | 
+                            <strong>Category:</strong> ${item.category || 'N/A'} | 
+                            <strong>Type:</strong> ${item.type || 'N/A'} | 
+                            <strong>Frequency:</strong> ${item.frequency || 'N/A'}
+                            ${item.url ? `| <a href="https://tradingeconomics.com${item.url}" target="_blank">View on TE</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsEl.innerHTML = html;
+        }
+        
+        function showMockResults(query) {
+            const resultsEl = document.getElementById('results');
+            
+            // Mock results for demonstration when API is not accessible
+            const mockResults = [
+                {
+                    name: `${query.charAt(0).toUpperCase() + query.slice(1)} GDP Growth Rate`,
+                    country: query.includes('nigeria') ? 'Nigeria' : 'Various',
+                    category: 'Economic Indicators',
+                    type: 'WB',
+                    frequency: 'Quarterly',
+                    url: `/${query.toLowerCase()}/gdp-growth`
+                },
+                {
+                    name: `${query.charAt(0).toUpperCase() + query.slice(1)} Inflation Rate`,
+                    country: query.includes('nigeria') ? 'Nigeria' : 'Various',
+                    category: 'Economic Indicators',
+                    type: 'National Statistics',
+                    frequency: 'Monthly',
+                    url: `/${query.toLowerCase()}/inflation-rate`
+                },
+                {
+                    name: `${query.charAt(0).toUpperCase() + query.slice(1)} Trade Data`,
+                    country: query.includes('nigeria') ? 'Nigeria' : 'Various',
+                    category: 'Trade',
+                    type: 'Comtrade',
+                    frequency: 'Annual',
+                    url: `/${query.toLowerCase()}/exports`
+                }
+            ];
+            
+            let html = `
+                <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <strong>📝 Demo Results:</strong> Since direct API access is restricted by CORS, 
+                    here are mock results showing the data structure you would receive.
+                </div>
+                <h3>📊 Mock results for "${query}"</h3>
+            `;
+            
+            mockResults.forEach(item => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-title">${item.name}</div>
+                        <div class="result-meta">
+                            <strong>Country:</strong> ${item.country} | 
+                            <strong>Category:</strong> ${item.category} | 
+                            <strong>Type:</strong> ${item.type} | 
+                            <strong>Frequency:</strong> ${item.frequency}
+                            <a href="https://tradingeconomics.com${item.url}" target="_blank">View on TE</a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsEl.innerHTML = html;
+        }
+        
+        function searchFor(term) {
+            document.getElementById('searchInput').value = term;
+            performSearch();
+        }
+        
+        // Allow Enter key to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Perform initial search
+        window.onload = function() {
+            performSearch();
+        };
+    </script>
+</body>
+</html>

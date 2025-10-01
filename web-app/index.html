@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Economics - Country Comparison Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Trading Economics Country Comparison Dashboard</h1>
+            <p>Compare economic indicators between different countries using real-time data</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="country1">First Country:</label>
+                <select id="country1">
+                    <option value="united-states">United States</option>
+                    <option value="nigeria">Nigeria</option>
+                    <option value="china">China</option>
+                    <option value="germany">Germany</option>
+                    <option value="japan">Japan</option>
+                    <option value="united-kingdom">United Kingdom</option>
+                    <option value="france">France</option>
+                    <option value="india">India</option>
+                    <option value="brazil">Brazil</option>
+                    <option value="canada">Canada</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="country2">Second Country:</label>
+                <select id="country2">
+                    <option value="nigeria" selected>Nigeria</option>
+                    <option value="united-states">United States</option>
+                    <option value="china">China</option>
+                    <option value="germany">Germany</option>
+                    <option value="japan">Japan</option>
+                    <option value="united-kingdom">United Kingdom</option>
+                    <option value="france">France</option>
+                    <option value="india">India</option>
+                    <option value="brazil">Brazil</option>
+                    <option value="canada">Canada</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="indicator">Economic Indicator:</label>
+                <select id="indicator">
+                    <option value="gdp">GDP Growth Rate</option>
+                    <option value="inflation">Inflation Rate</option>
+                    <option value="unemployment">Unemployment Rate</option>
+                    <option value="interest-rate">Interest Rate</option>
+                    <option value="population">Population</option>
+                    <option value="government-debt-to-gdp">Government Debt to GDP</option>
+                </select>
+            </div>
+
+            <button id="compareBtn" class="compare-btn">Compare Countries</button>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading economic data...</p>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card" id="country1-card">
+                    <h3 id="country1-name"></h3>
+                    <div class="stat-value" id="country1-value"></div>
+                    <div class="stat-label" id="country1-label"></div>
+                    <div class="stat-date" id="country1-date"></div>
+                </div>
+
+                <div class="stat-card" id="country2-card">
+                    <h3 id="country2-name"></h3>
+                    <div class="stat-value" id="country2-value"></div>
+                    <div class="stat-label" id="country2-label"></div>
+                    <div class="stat-date" id="country2-date"></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+
+            <div class="additional-info">
+                <h3>Trade Relationship</h3>
+                <div id="trade-info" class="trade-grid">
+                    <!-- Trade information will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="error" style="display: none;">
+            <h3>⚠️ Error</h3>
+            <p id="error-message"></p>
+        </div>
+
+        <footer>
+            <p>Data provided by <a href="https://tradingeconomics.com" target="_blank">Trading Economics</a></p>
+            <p>Built as part of the Trading Economics Developer Challenge</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
