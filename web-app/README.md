@@ -1,5 +1,16 @@
 # Trading Economics Country Comparison Dashboard
 
+## Images
+
+![alt text](image.png)
+
+![alt text](image-1.png)
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
+![alt text](image-4.png)
+
 ## 🌍 Overview
 
 This web application provides a comprehensive comparison tool for economic indicators between different countries using the Trading Economics API. It's designed as part of the Trading Economics Developer Challenge and demonstrates real-time economic data visualization and analysis.
@@ -37,42 +48,52 @@ Simply open `index.html` in your web browser to start using the application.
 ## 🌐 Supported Countries
 
 The application includes data for major economies:
-- United States
-- Nigeria
-- China
-- Germany
-- Japan
-- United Kingdom
-- France
-- India
-- Brazil
-- Canada
+- Mexico
+- New Zealand
+- Thailand
+- Sweden
 
-## 🔧 Setup Instructions
+## � API Integration
 
-### Prerequisites
-- A modern web browser (Chrome, Firefox, Safari, Edge)
-- Internet connection for CDN resources
-- Trading Economics API key (optional for full functionality)
+### Live Data Access
+This application  integrates with  **Trading Economics Developer API key** and provides real-time data for:
 
-### Installation
-1. Clone or download the repository
-2. Navigate to the `web-app` directory
-3. Open `index.html` in your web browser
+**🌍 Available Countries (Free Developer Account):**
+- **Mexico** 🇲🇽 - Full economic indicators and market data
+- **New Zealand** 🇳🇿 - Full economic indicators and market data  
+- **Sweden** 🇸🇪 - Full economic indicators and market data
+- **Thailand** 🇹🇭 - Full economic indicators and market data
+
+**📊 Available Data:**
+- Economic indicators (GDP, inflation, unemployment, etc.)
+- Live market indices 
+- Real-time financial data
+- Search functionality
 
 ### API Configuration
-To use real Trading Economics data:
-1. Sign up at [Trading Economics Developer Portal](http://developer.tradingeconomics.com)
-2. Get your API key
-3. Replace the `apiKey` variable in `app.js` with your actual key
-4. Update the API calls to use real endpoints instead of mock data
+The application is pre-configured with the free developer API key
+
+### Testing Your API Access
+Open `api-test.html` to test and verify  API connectivity and see live data examples.
 
 ## 💻 Usage
 
-1. **Select Countries**: Choose two different countries from the dropdown menus
+### Main Dashboard (`index.html`)
+1. **Select Countries**: Choose from Mexico, New Zealand, Sweden, Thailand (live API data) 
 2. **Choose Indicator**: Select the economic indicator you want to compare
 3. **Compare**: Click the "Compare Countries" button
-4. **Analyze Results**: View the comparison in the statistics cards, interactive chart, and trade relationship section
+4. **Analyze Results**: View comparison in statistics cards, interactive chart, trade relationships, and live market data
+
+### API Testing (`api-test.html`)
+1. **Test Connectivity**: Verify your API key is working
+2. **Live Market Data**: See real-time market indices
+3. **Economic Indicators**: Fetch actual economic data
+4. **Search Functionality**: Test the search API
+
+### Search Demo (`search-demo.html`)
+1. **Interactive Search**: Use the Trading Economics search API
+2. **Query Examples**: Try pre-built search terms
+3. **Data Discovery**: Explore available datasets
 
 ## 🎨 Design Features
 
@@ -134,7 +155,7 @@ Potential improvements for the application:
 
 This application demonstrates integration with several Trading Economics endpoints:
 - Indicators API for economic data
-- Comtrade API for trade relationships
+
 - Search API for data discovery
 
 ## 🤝 Contributing
@@ -159,4 +180,4 @@ For questions about this implementation or the Trading Economics API, please ref
 
 ---
 
-*Built with ❤️ as part of the Trading Economics Developer Challenge*
+*Built with ❤️ as part of the Ngenoh for the Trading Economics Developer Challenge*

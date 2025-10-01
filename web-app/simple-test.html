@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple API Test - Trading Economics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Trading Economics API Test</h1>
+        <p>This test uses the same exact method as the working api-test.html</p>
+        
+        <button onclick="testConnection()">Test Basic Connection</button>
+        <button onclick="testMexico()">Test Mexico Data</button>
+        <button onclick="testThailand()">Test Thailand Data</button>
+        <button onclick="testNewZealand()">Test New Zealand Data</button>
+        <button onclick="testSweden()">Test Sweden Data</button>
+        <button onclick="testIndicator()">Test Indicator Method</button>
+        <button onclick="testComparison()">Test Simple Comparison</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'eb9e5650ff02410:utlcbsnmgfich3z';
+        const BASE_URL = 'https://api.tradingeconomics.com';
+        
+        function showResult(content, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + (isSuccess ? 'success' : 'error');
+            resultDiv.innerHTML = content;
+        }
+        
+        async function testConnection() {
+            showResult('🔄 Testing basic connection...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/markets/index?c=${API_KEY}&f=json`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Connection successful! Received ${data.length} market items`, true);
+                } else {
+                    showResult(`❌ Connection failed: HTTP ${response.status}`, false);
+                }
+            } catch (error) {
+                showResult(`❌ Connection error: ${error.message}`, false);
+            }
+        }
+        
+        async function testMexico() {
+            await testCountry('mexico', 'Mexico');
+        }
+        
+        async function testThailand() {
+            await testCountry('thailand', 'Thailand');
+        }
+        
+        async function testNewZealand() {
+            await testCountry('new-zealand', 'New Zealand');
+        }
+        
+        async function testSweden() {
+            await testCountry('sweden', 'Sweden');
+        }
+        
+        async function testCountry(countryCode, countryName) {
+            showResult(`🔄 Testing ${countryName} data...`);
+            
+            try {
+                const response = await fetch(`${BASE_URL}/country/${countryCode}?c=${API_KEY}&f=json`);
+                
+                console.log(`${countryName} response:`, response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showResult(`
+                    ✅ ${countryName} data successful!
+                    <br>Received ${data.length} indicators
+                    <br>Sample categories: ${data.slice(0, 5).map(d => d.Category || 'No Category').join(', ')}
+                    <details>
+                        <summary>First 3 items</summary>
+                        <pre>${JSON.stringify(data.slice(0, 3), null, 2)}</pre>
+                    </details>
+                `, true);
+                
+            } catch (error) {
+                showResult(`❌ ${countryName} test failed: ${error.message}`, false);
+            }
+        }
+        
+        async function testIndicator() {
+            showResult('🔄 Testing indicator method (same as main app)...');
+            
+            try {
+                // Use the same exact method as the main app
+                const url = `${BASE_URL}/country/mexico?c=${API_KEY}&f=json`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Look for GDP indicator (same logic as main app)
+                const gdpIndicators = data.filter(item => 
+                    item.Category && item.Category.toLowerCase().includes('gdp')
+                );
+                
+                if (gdpIndicators.length > 0) {
+                    const gdp = gdpIndicators[0];
+                    const result = {
+                        value: gdp.LatestValue || gdp.Value,
+                        date: gdp.LatestValueDate || gdp.Date,
+                        unit: gdp.Unit || '%',
+                        category: gdp.Category
+                    };
+                    
+                    showResult(`
+                        ✅ Indicator method works!
+                        <br>Found GDP indicator: ${result.category}
+                        <br>Value: ${result.value} ${result.unit}
+                        <br>Date: ${result.date}
+                        <details>
+                            <summary>Full result</summary>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </details>
+                    `, true);
+                } else {
+                    showResult(`❌ No GDP indicators found in ${data.length} items`, false);
+                }
+                
+            } catch (error) {
+                showResult(`❌ Indicator test failed: ${error.message}`, false);
+            }
+        }
+        
+        async function testComparison() {
+            showResult('🔄 Testing simple comparison (Mexico vs New Zealand)...');
+            
+            try {
+                // Test the exact same flow as the main app comparison
+                const [mexicoResponse, nzResponse] = await Promise.all([
+                    fetch(`${BASE_URL}/country/mexico?c=${API_KEY}&f=json`),
+                    fetch(`${BASE_URL}/country/new-zealand?c=${API_KEY}&f=json`)
+                ]);
+                
+                if (!mexicoResponse.ok || !nzResponse.ok) {
+                    throw new Error(`API error: Mexico ${mexicoResponse.status}, NZ ${nzResponse.status}`);
+                }
+                
+                const [mexicoData, nzData] = await Promise.all([
+                    mexicoResponse.json(),
+                    nzResponse.json()
+                ]);
+                
+                showResult(`
+                    ✅ Comparison test successful!
+                    <br>Mexico indicators: ${mexicoData.length}
+                    <br>New Zealand indicators: ${nzData.length}
+                    <br>This proves the API calls work in parallel!
+                `, true);
+                
+            } catch (error) {
+                showResult(`❌ Comparison test failed: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

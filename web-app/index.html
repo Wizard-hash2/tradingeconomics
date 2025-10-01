@@ -12,39 +12,31 @@
     <div class="container">
         <header>
             <h1>🌍 Trading Economics Country Comparison Dashboard</h1>
-            <p>Compare economic indicators between different countries using real-time data</p>
+            <p>Compare economic indicators using real-time Trading Economics API data</p>
+            <div class="api-notice">
+                ⚠️ <strong>API Status:</strong> Currently confirmed working countries: Mexico 🇲🇽 and Thailand 🇹🇭. 
+                New Zealand and Sweden may have limited data access with this API plan.
+            </div>
         </header>
 
         <div class="controls">
             <div class="control-group">
                 <label for="country1">First Country:</label>
                 <select id="country1">
-                    <option value="united-states">United States</option>
-                    <option value="nigeria">Nigeria</option>
-                    <option value="china">China</option>
-                    <option value="germany">Germany</option>
-                    <option value="japan">Japan</option>
-                    <option value="united-kingdom">United Kingdom</option>
-                    <option value="france">France</option>
-                    <option value="india">India</option>
-                    <option value="brazil">Brazil</option>
-                    <option value="canada">Canada</option>
+                    <option value="mexico">🇲🇽 Mexico</option>
+                    <option value="new-zealand">🇳🇿 New Zealand</option>
+                    <option value="sweden">🇸🇪 Sweden</option>
+                    <option value="thailand">🇹🇭 Thailand</option>
                 </select>
             </div>
 
             <div class="control-group">
                 <label for="country2">Second Country:</label>
                 <select id="country2">
-                    <option value="nigeria" selected>Nigeria</option>
-                    <option value="united-states">United States</option>
-                    <option value="china">China</option>
-                    <option value="germany">Germany</option>
-                    <option value="japan">Japan</option>
-                    <option value="united-kingdom">United Kingdom</option>
-                    <option value="france">France</option>
-                    <option value="india">India</option>
-                    <option value="brazil">Brazil</option>
-                    <option value="canada">Canada</option>
+                    <option value="thailand" selected>🇹🇭 Thailand</option>
+                    <option value="mexico">🇲🇽 Mexico</option>
+                    <option value="new-zealand">🇳🇿 New Zealand</option>
+                    <option value="sweden">🇸🇪 Sweden</option>
                 </select>
             </div>
 
@@ -61,6 +53,16 @@
             </div>
 
             <button id="compareBtn" class="compare-btn">Compare Countries</button>
+            <button id="showIndicatorsBtn" class="compare-btn" style="background: #28a745;">Show Available Indicators</button>
+            <button id="testApiBtn" class="compare-btn" style="background: #17a2b8;">Test API Connection</button>
+            <button onclick="window.dashboard && window.dashboard.checkRequiredElements()" class="compare-btn" style="background: #6c757d;">Debug Elements</button>
+        </div>
+
+        <div class="indicators-preview" id="indicators-preview" style="display: none;">
+            <h3>📊 Available Economic Indicators</h3>
+            <div id="indicators-list" class="indicators-grid">
+                <!-- Available indicators will be populated here -->
+            </div>
         </div>
 
         <div class="loading" id="loading" style="display: none;">
@@ -95,6 +97,13 @@
                     <!-- Trade information will be populated here -->
                 </div>
             </div>
+
+            <div class="market-data-section">
+                <h3>📈 Live Market Data</h3>
+                <div id="market-data" class="market-grid">
+                    <!-- Market data will be populated here -->
+                </div>
+            </div>
         </div>
 
         <div class="error" id="error" style="display: none;">
@@ -103,8 +112,8 @@
         </div>
 
         <footer>
-            <p>Data provided by <a href="https://tradingeconomics.com" target="_blank">Trading Economics</a></p>
-            <p>Built as part of the Trading Economics Developer Challenge</p>
+            <p>Real-time data provided by <a href="https://tradingeconomics.com" target="_blank">Trading Economics API</a></p>
+            <p>Live data for Mexico, New Zealand, Sweden & Thailand • Built for Trading Economics Developer Challenge</p>
         </footer>
     </div>
 

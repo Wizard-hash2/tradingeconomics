@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Economics API - Live Data Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .api-status {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #007bff;
+        }
+        
+        .api-key-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .result-area {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-area pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .market-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .market-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        
+        .available-countries {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Trading Economics API - Live Data Test</h1>
+        
+        <div class="api-status">
+            <h3>API Configuration</h3>
+            <p><strong>Your API Key:</strong></p>
+            <div class="api-key-display">eb9e5650ff02410:utlcbsnmgfich3z</div>
+            <p><strong>API Status:</strong> <span id="api-status">Testing...</span></p>
+        </div>
+        
+        <div class="available-countries">
+            <h4>📍 Countries Available with Your Free Developer Account:</h4>
+            <ul>
+                <li><strong>Mexico</strong> 🇲🇽 - Economic indicators and market data</li>
+                <li><strong>New Zealand</strong> 🇳🇿 - Economic indicators and market data</li>
+                <li><strong>Sweden</strong> 🇸🇪 - Economic indicators and market data</li>
+                <li><strong>Thailand</strong> 🇹🇭 - Economic indicators and market data</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏛️ Market Indices Test</h3>
+            <p>Test access to real-time market index data:</p>
+            <button class="test-button" onclick="testMarketData()">📈 Fetch Live Market Data</button>
+            <div id="market-result" class="result-area" style="display: none;"></div>
+            <div id="market-display" class="market-grid"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Economic Indicators Test</h3>
+            <p>Test access to economic indicators for available countries:</p>
+            <button class="test-button" onclick="testIndicators('mexico')">🇲🇽 Mexico Indicators</button>
+            <button class="test-button" onclick="testIndicators('new-zealand')">🇳🇿 New Zealand Indicators</button>
+            <button class="test-button" onclick="testIndicators('sweden')">🇸🇪 Sweden Indicators</button>
+            <button class="test-button" onclick="testIndicators('thailand')">🇹🇭 Thailand Indicators</button>
+            <div id="indicators-result" class="result-area" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Search API Test</h3>
+            <p>Test the search functionality:</p>
+            <input type="text" id="search-input" placeholder="Search for economic data..." value="mexico" style="padding: 8px; width: 300px; margin-right: 10px;">
+            <button class="test-button" onclick="testSearch()">🔍 Search</button>
+            <div id="search-result" class="result-area" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'eb9e5650ff02410:utlcbsnmgfich3z';
+        const BASE_URL = 'https://api.tradingeconomics.com';
+        
+        // Test API connectivity
+        async function testAPIConnection() {
+            try {
+                const response = await fetch(`${BASE_URL}/markets/index?c=${API_KEY}&f=json`);
+                if (response.ok) {
+                    document.getElementById('api-status').innerHTML = '<span class="success">✅ Connected</span>';
+                } else {
+                    document.getElementById('api-status').innerHTML = '<span class="error">❌ Connection Failed</span>';
+                }
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = '<span class="error">❌ Connection Error</span>';
+            }
+        }
+        
+        async function testMarketData() {
+            const resultDiv = document.getElementById('market-result');
+            const displayDiv = document.getElementById('market-display');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">🔄 Fetching live market data...</div>';
+            displayDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/markets/index?c=${API_KEY}&f=json`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Successfully fetched ${data.length} market indices</div>
+                    <pre>${JSON.stringify(data.slice(0, 3), null, 2)}</pre>
+                `;
+                
+                // Display formatted market data
+                let marketHTML = '';
+                data.slice(0, 6).forEach(market => {
+                    const change = parseFloat(market.DailyChange || 0);
+                    const changeClass = change >= 0 ? 'positive' : 'negative';
+                    const changeSymbol = change >= 0 ? '+' : '';
+                    
+                    marketHTML += `
+                        <div class="market-card">
+                            <h4>${market.Symbol} - ${market.Country}</h4>
+                            <div class="market-price">${market.Last?.toFixed(2) || 'N/A'}</div>
+                            <div class="${changeClass}">
+                                ${changeSymbol}${change.toFixed(2)} (${(parseFloat(market.DailyPercentualChange || 0)).toFixed(2)}%)
+                            </div>
+                            <small>Last Update: ${new Date(market.Date).toLocaleString()}</small>
+                        </div>
+                    `;
+                });
+                
+                displayDiv.innerHTML = marketHTML;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testIndicators(country) {
+            const resultDiv = document.getElementById('indicators-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<div class="loading">🔄 Fetching indicators for ${country}...</div>`;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/country/${country}?c=${API_KEY}&f=json`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Successfully fetched ${data.length} indicators for ${country}</div>
+                    <h4>Sample Indicators:</h4>
+                    <pre>${JSON.stringify(data.slice(0, 5), null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testSearch() {
+            const query = document.getElementById('search-input').value;
+            const resultDiv = document.getElementById('search-result');
+            
+            if (!query.trim()) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<div class="loading">🔄 Searching for "${query}"...</div>`;
+            
+            try {
+                const url = `https://brains.tradingeconomics.com/v2/search/wb,fred,comtrade?q=${encodeURIComponent(query)}&pp=20&p=0&_=${Date.now()}&stance=2`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Found ${data.hits?.length || 0} results for "${query}"</div>
+                    <pre>${JSON.stringify(data.hits?.slice(0, 3) || [], null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Search Error: ${error.message}</div>
+                    <p><small>Note: CORS restrictions may prevent direct API calls from browsers. 
+                    This would work fine in a backend server environment.</small></p>
+                `;
+            }
+        }
+        
+        // Test connection on page load
+        window.onload = function() {
+            testAPIConnection();
+            // Auto-test market data
+            setTimeout(testMarketData, 1000);
+        };
+    </script>
+</body>
+</html>
